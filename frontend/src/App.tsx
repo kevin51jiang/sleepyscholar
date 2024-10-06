@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import ResultsPage from "./pages/ResultsPage";
 import { ScholarshipForm } from "./pages/ScholarshipForm";
 import { ScholarshipPage } from "./pages/ScholarshipPage";
+import { ScholarshipsPage } from "./pages/ScholarshipsPage";
 
 const App: React.FC = () => {
   return (
@@ -13,6 +14,7 @@ const App: React.FC = () => {
       <main className="flex-grow">
         <Switch>
           <Route path="/" component={HomePage} />
+          <Route path="/scholarships" component={ScholarshipsPage} />
           <Route path="/results" component={ResultsPage} />
           <Route path="/test" component={ScholarshipForm} />
           <Route path="/scholarships/:scholarship_id" component={ScholarshipPage} />

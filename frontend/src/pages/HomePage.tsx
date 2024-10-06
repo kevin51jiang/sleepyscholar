@@ -9,7 +9,7 @@ const HomePage: React.FC = () => {
       <p className="mb-4">Find the perfect scholarship opportunities for your academic journey.</p>
       <div className="space-x-4">
         <Button asChild>
-          <Link href="/results?q=all">
+          <Link href="/scholarships">
             View All Scholarships
           </Link>
         </Button>
