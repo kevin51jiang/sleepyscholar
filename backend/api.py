@@ -8,7 +8,7 @@ import os
 from fastapi.middleware.cors import CORSMiddleware
 
 client = Groq(
-        api_key="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"
+        api_key=""
         )
 
 app.add_middleware(
