@@ -1,77 +1,48 @@
-import React from 'react';
-import { Link, useLocation } from 'wouter';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { ScholarshipCard } from "@/components/ScholarshipCard";
+import { NiceScholarship } from "@/lib/scholarship";
 
-const scholarships = [
-  {
-    id: "1",
-    name: "STEM Excellence Scholarship",
-    description: "For outstanding students in Science, Technology, Engineering, or Mathematics.",
-    deadline: "December 31, 2024",
-    amount: "$5000",
-  },
-  {
-    id: "2",
-    name: "Arts and Humanities Grant",
-    description: "Supporting creative minds in various artistic and humanistic disciplines.",
-    deadline: "November 15, 2024",
-    amount: "$3500",
-  },
-  // Add more scholarships as needed
-];
+export const ResultsPage: React.FC = () => {
+  const [scholarships, setScholarships] = useState<NiceScholarship[]>([]);
+  const [_, setLocation] = useLocation();
 
+  useEffect(() => {
+    const savedResults = localStorage.getItem("scholarshipSearchResults");
+    if (savedResults) {
+      setScholarships(JSON.parse(savedResults));
+    }
+  }, []);
 
-const ResultsPage: React.FC = () => {
-  const [location] = useLocation();
-  const query = new URLSearchParams(location.split('?')[1]).get('q') || '';
+  const handleBackToForm = () => {
+    setLocation("/");
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Scholarship Results</h1>
-      <p className="mb-4">Showing results for: {query}</p>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {scholarships.map((scholarship, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <CardTitle>{scholarship.name}</CardTitle>
-              <CardDescription>{scholarship.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">{scholarship.requirements}</p>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <p className="text-sm text-gray-400">Deadline: {scholarship.deadline}</p>
-              <Button variant="outline" asChild>
-                  <Link href={`/scholarships/${scholarship.id}`}>
-                    View Details
-                  </Link>
-                </Button>
-            </CardFooter>
-          </Card>
-        ))}
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-white mb-8 text-center">
+          Scholarship Results
+        </h1>
+        <Button onClick={handleBackToForm} className="mb-6">
+          Back to Form
+        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {scholarships.map((scholarship, index) => (
+            <ScholarshipCard
+              key={index}
+              scholarship={scholarship}
+              id={index.toString()}
+            />
+          ))}
+        </div>
+        {scholarships.length === 0 && (
+          <p className="text-white text-center text-xl mt-8">
+            No scholarships found. Please try adjusting your search criteria.
+          </p>
+        )}
       </div>
-
-      <Pagination className="mt-8">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </div>
   );
 };
-
-export default ResultsPage;

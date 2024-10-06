@@ -6,6 +6,8 @@ import ResultsPage from "./pages/ResultsPage";
 import { ScholarshipForm } from "./pages/ScholarshipForm";
 import { ScholarshipPage } from "./pages/ScholarshipPage";
 import { ScholarshipsPage } from "./pages/ScholarshipsPage";
+import { Toaster } from 'sonner';
+
 
 const App: React.FC = () => {
   return (
@@ -19,6 +21,7 @@ const App: React.FC = () => {
           <Route path="/test" component={ScholarshipForm} />
           <Route path="/scholarships/:scholarship_id" component={ScholarshipPage} />
         </Switch>
+        <Toaster />
       </main>
     </div>
   );

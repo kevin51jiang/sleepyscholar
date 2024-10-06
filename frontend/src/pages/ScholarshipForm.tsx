@@ -1,61 +1,102 @@
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { Config } from '@/lib/api';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { Config } from "@/lib/api";
+import { useLocation } from "wouter";
+import { toast } from "sonner";
 
 export const ScholarshipForm: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const form = useForm({
     defaultValues: {
-      name: '',
-      gpa: '',
-      major: '',
-      school: '',
+      name: "",
+      gpa: "",
+      major: "",
+      school: "",
       firstGenStudent: false,
-      gender: '',
-      financialAid: '',
-      yearOfStudy: '',
+      gender: "",
+      financialAid: "",
+      yearOfStudy: "",
       citizenship: false,
     },
-  })
+  });
+
+  const [_, setLocation] = useLocation();
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("scholarshipFormData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      form.reset(parsedData);
+    }
+    setIsLoading(false);
+  }, [form]);
 
   const onSubmit = async (data: any) => {
     console.log(data);
+    // Save form data to localStorage
+    localStorage.setItem("scholarshipFormData", JSON.stringify(data));
+
     // Handle form submission here
     try {
       const response = await fetch(`${Config.API_URL}/search`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name_of_student: data.name,
           GPA_needed: data.gpa,
           major_needed: data.major,
-          first_gen: data.firstGenStudent ? 'yes' : 'no',
+          first_gen: data.firstGenStudent ? "yes" : "no",
           gender_student: data.gender,
           fafsa_bool: data.financialAid,
           class_level: data.yearOfStudy,
-          citizenship_required: data.citizenship ? 'yes' : 'no',
+          citizenship_required: data.citizenship ? "yes" : "no",
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       const result = await response.json();
-      console.log('Search results:', result);
-      // Handle the search results here (e.g., update state, display results)
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      // Handle errors here (e.g., show error message to user)
-    }
+      console.log("Search results:", result);
 
+      // Save search results to localStorage
+      localStorage.setItem("scholarshipSearchResults", JSON.stringify(result));
+
+      if (result.length === 0) {
+        toast.error("No scholarships found for the given criteria.");
+      } else {
+        setLocation("/results?q=all");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("An error occurred while searching for scholarships.");
+    }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 to-indigo-600 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -138,7 +179,10 @@ export const ScholarshipForm: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Gender</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Gender" />
@@ -159,7 +203,10 @@ export const ScholarshipForm: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Financial Aid</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Financial Aid" />
@@ -180,7 +227,10 @@ export const ScholarshipForm: React.FC = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Year of Study</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select Year of Study" />

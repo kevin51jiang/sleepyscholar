@@ -1,5 +1,5 @@
-import React from "react";
-import { useParams } from "wouter";
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "wouter";
 import {
   Card,
   CardContent,
@@ -9,73 +9,70 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { NiceScholarship } from "@/lib/scholarship";
 
 export const ScholarshipPage: React.FC = () => {
   const { scholarship_id } = useParams();
+  const [scholarship, setScholarship] = useState<NiceScholarship | null>(null);
 
-  // This is a placeholder. You'd typically fetch the scholarship data based on the scholarship_id
-  const scholarship = {
-    id: scholarship_id,
-    name: "Excellence in STEM Scholarship",
-    description:
-      "This scholarship is designed to support outstanding students pursuing degrees in Science, Technology, Engineering, or Mathematics.",
-    requirements: [
-      "Minimum GPA of 3.5",
-      "Major in a STEM field",
-      "Full-time enrollment",
-      "Demonstrated leadership in extracurricular activities",
-      "Two letters of recommendation",
-    ],
-    deadline: "May 15, 2024",
-    amount: "$10,000",
-    eligibility:
-      "Open to undergraduate students in their sophomore or junior year",
-    applicationProcess:
-      "Submit online application, including personal statement and academic transcripts.",
-  };
+  useEffect(() => {
+    const savedResults = localStorage.getItem("scholarshipSearchResults");
+    if (savedResults) {
+      const scholarships: NiceScholarship[] = JSON.parse(savedResults);
+      const index = parseInt(scholarship_id || "0", 10);
+      if (scholarships[index]) {
+        setScholarship(scholarships[index]);
+      }
+    }
+  }, [scholarship_id]);
 
+  if (!scholarship) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl">{scholarship.name}</CardTitle>
           <CardDescription className="text-lg">
-            {scholarship.description}
+            {scholarship.scholarshipDescription}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div>
               <h3 className="text-xl font-semibold mb-2">Requirements</h3>
-              <ul className="list-disc list-inside space-y-1">
-                {scholarship.requirements.map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
+              <ul className="list-disc pl-5">
+                <li>GPA: {scholarship.gpa}</li>
+                <li>Major: {scholarship.major}</li>
+                <li>First Generation Student: {scholarship.firstGen}</li>
+                <li>Gender: {scholarship.gender}</li>
+                <li>FAFSA Eligibility: {scholarship.fafsa}</li>
+                <li>Citizenship Required: {scholarship.citizenship}</li>
               </ul>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-2">Eligibility</h3>
-              <p>{scholarship.eligibility}</p>
+              <h3 className="text-xl font-semibold mb-2">Year of Study</h3>
+              <p>{scholarship.year_of_study}</p>
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-2">Award Amount</h3>
-              <p>{scholarship.amount}</p>
+              <p>{scholarship.awardAmount}</p>
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-2">
-                Application Process
+                Application Questions
               </h3>
-              <p>{scholarship.applicationProcess}</p>
+              <p>{scholarship.scholarshipQuestions}</p>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between items-center">
           <p className="text-sm text-gray-500">
-            Application Deadline: {scholarship.deadline}
+            Application Deadline: {scholarship.deadline || "Not Stated"}
           </p>
           <Button asChild>
-            <Link href={`/apply/${scholarship.id}`}>Apply Now</Link>
+            <a href={scholarship.scholarshipURL}>Apply Now</a>
           </Button>
         </CardFooter>
       </Card>
