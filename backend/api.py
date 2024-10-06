@@ -92,13 +92,13 @@ async def get_top_20_scholarships():
     return allScholarship
 
 @app.post("/generate", response_model=str)
-async def generate_content(search: ScholarshipSearch):
+async def generate_content(search: int):
 
-    index = ScholarshipSearch
+    index = search
 
     currentScholarship = matching_scholarships[index]
 
-    scholarshipQestionCurrent = currentScholarship['scholarshipQuestions']
+    scholarshipQuestionCurrent = currentScholarship['scholarshipQuestions']
 
     chat_completion = client.chat.completions.create(
             messages=[
