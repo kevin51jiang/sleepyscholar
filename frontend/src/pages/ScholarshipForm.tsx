@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
+import { Config } from '@/lib/api';
 
 export const ScholarshipForm: React.FC = () => {
   const form = useForm({
@@ -21,9 +22,39 @@ export const ScholarshipForm: React.FC = () => {
     },
   })
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log(data);
     // Handle form submission here
+    try {
+      const response = await fetch(`${Config.API_URL}/search`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name_of_student: data.name,
+          GPA_needed: data.gpa,
+          major_needed: data.major,
+          first_gen: data.firstGenStudent ? 'yes' : 'no',
+          gender_student: data.gender,
+          fafsa_bool: data.financialAid,
+          class_level: data.yearOfStudy,
+          citizenship_required: data.citizenship ? 'yes' : 'no',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('Search results:', result);
+      // Handle the search results here (e.g., update state, display results)
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Handle errors here (e.g., show error message to user)
+    }
+
   };
 
   return (

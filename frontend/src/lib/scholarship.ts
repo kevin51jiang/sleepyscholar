@@ -59,3 +59,19 @@ export interface Scholarship {
     awardAmount: string;
     description: string;
 }
+
+export interface NiceScholarship {
+    name: string;
+    major: string;
+    gpa: string;
+    firstGen: string;
+    gender: string;
+    fafsa: string;
+    year_of_study: string;
+    citizenship: string;
+    scholarshipQuestions: string;
+    scholarshipURL: string;
+    deadline: string;
+    awardAmount: string;
+    scholarshipDescription: string;
+}

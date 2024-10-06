@@ -10,6 +10,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import {
+  NiceScholarship,
   RawScholarship,
   rawScholarshipToScholarship,
   Scholarship,
@@ -21,15 +22,13 @@ export const ScholarshipsPage: React.FC = () => {
   const [location] = useLocation();
   const query = new URLSearchParams(location.split("?")[1]).get("q") || "";
 
-  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [scholarships, setScholarships] = useState<NiceScholarship[]>([]);
   useEffect(() => {
     const fetchScholarships = async () => {
       const response = await fetch(`${Config.API_URL}/scholarships`);
-      const data = await response.json();
-      const parsedScholarships = data.map((rawScholarship: RawScholarship) =>
-        rawScholarshipToScholarship(rawScholarship)
-      );
-      setScholarships(parsedScholarships);
+      const data: NiceScholarship[] = await response.json();
+
+      setScholarships(data);
     };
     fetchScholarships();
   }, []);

@@ -8,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Scholarship } from "../lib/scholarship";
+import { NiceScholarship, Scholarship } from "../lib/scholarship";
 
 interface ScholarshipCardProps {
-  scholarship: Scholarship;
+  scholarship: NiceScholarship;
   id: string;
 }
 
@@ -23,10 +23,10 @@ export const ScholarshipCard: React.FC<ScholarshipCardProps> = ({
     <Card>
       <CardHeader>
         <CardTitle>{scholarship.name}</CardTitle>
-        <CardDescription>{scholarship.description}</CardDescription>
+        <CardDescription>{scholarship.scholarshipDescription}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-500">{scholarship.classLevel}</p>
+        <p className="text-sm text-gray-500">{scholarship.year_of_study}</p>
       </CardContent>
       <CardFooter className="flex justify-between">
         <p className="text-sm text-gray-400">

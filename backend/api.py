@@ -11,6 +11,9 @@ client = Groq(
         api_key="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"
         )
 
+
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -23,7 +26,6 @@ app.add_middleware(
 async def read_root():
     return {"message": "CORS enabled for all origins!"}
 
-app = FastAPI()
 
 def load_jsonl_file(file_path):
     data = []
@@ -40,7 +42,7 @@ def load_jsonl_file(file_path):
 user_data = {}
 scholarships = []
 matching_scholarships = []
-scholarships = load_jsonl_file('/home/ubuntu/URLsmallBatch scrape.jsonl')  
+scholarships = load_jsonl_file('./URLsmallBatch scrape.jsonl')  
 
 # Data model for the search request
 class ScholarshipSearch(BaseModel):
@@ -89,7 +91,7 @@ async def get_top_20_scholarships():
         raise HTTPException(status_code=404, detail="No scholarships available.")
     return allScholarship
 
-@app.post("/generate", scholarship=str)
+@app.post("/generate", response_model=str)
 async def generate_content(search: ScholarshipSearch):
 
     index = ScholarshipSearch
@@ -204,6 +206,8 @@ async def search_scholarships(search: ScholarshipSearch):
             ],
             model="llama-3.2-90b-text-preview",
         )
+
+        print(chat_completion.choices[0].message.content)
 
         if chat_completion.choices[0].message.content == "1":
             matching_scholarships.append(scholarship_data)
