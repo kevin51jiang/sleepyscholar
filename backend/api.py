@@ -108,6 +108,9 @@ async def generate_content(search: ScholarshipSearch):
                                     ### User Data:
                                     {user_data}
 
+                                    ### scholarship info:
+                                    {currentScholarship}
+
                                     ### Essay Question:
                                     {scholarshipQuestionCurrent}
 
