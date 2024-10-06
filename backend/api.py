@@ -7,7 +7,7 @@ import re
 import os
 
 client = Groq(
-        api_key="YOUR_API_KEY"
+        api_key="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"
         )
 
 
@@ -24,7 +24,8 @@ def load_jsonl_file(file_path):
                 except json.JSONDecodeError as e:
                     print(f"Error parsing line: {line}\nError: {e}")
     return data
-    
+
+user_data = {}
 scholarships = []
 scholarships = load_jsonl_file('/home/ubuntu/URLsmallBatch scrape.jsonl')  
 
@@ -65,15 +66,48 @@ async def get_top_20_scholarships():
             'year_of_study': scholarship.get('What is the class level for this scholarship?', '').lower(),
             'citizenship': scholarship.get('Are you required to be a citizen?', '').lower(),
             'scholarshipQuestions': scholarship.get('What are application questions for the scholarship?', '').lower(),
-            'scholarshipURL': scholarship.get('Attach the url containing this scholarships info and application information?', '').lower()}
+            'scholarshipURL': scholarship.get('Attach the url containing this scholarships info and application information?', '').lower(),
+            'deadline': scholarship.get('What is the deadline of the scholarship?', '').lower(),
+            'awardAmount': scholarship.get('What is the award amount of the scholarship?', '').lower(),
+            'scholarshipDescription': scholarship.get('What is the description of the scholarship?', '').lower(),}
         allScholarship.append(scholarship_data)
 
     if not allScholarship:
         raise HTTPException(status_code=404, detail="No scholarships available.")
     return allScholarship
 
+def sendUserEssay() -> str:
+    currentScholarshipDict = 
+
+    scholarshipQuestionCurrent = currentScholarshipDict['scholarshipQuestions']
+
+    chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+                                    You are tasked with generating an essay response for the user, considering the following:
+
+                                    ### User Data:
+                                    - Resume: {user_resume}
+                                    - Previous Essay: {previous_essay}
+
+                                    ### Essay Question:
+                                    {scholarshipQuestionCurrent}
+
+                                    Please generate an essay that incorporates the user's professional background, writing style from the previous essay, and is relevant to the essay question provided. Ensure the response is coherent and tailored to the user's experience and is around 300 words.
+                                """,
+                }
+            ],
+            model="llama-3.2-90b-text-preview",
+    )
+
+    if not chat_completion.choices[0].message.content:
+        raise HTTPException(status_code=404, detail="No esay response.")
+
+    return chat_completion.choices[0].message.content
+
 def getUserPrompt(search: ScholarshipSearch) -> dict:
-    user_data = {}
     user_data['name'] = search.name_of_student  # Correct field name
     user_data['major'] = search.major_needed
     user_data['gpa'] = search.GPA_needed
@@ -103,8 +137,10 @@ async def search_scholarships(search: ScholarshipSearch):
             'year_of_study': scholarship.get('What is the class level for this scholarship?', '').lower(),
             'citizenship': scholarship.get('Are you required to be a citizen?', '').lower(),
             'scholarshipQuestions': scholarship.get('What are application questions for the scholarship?', '').lower(),
-            'scholarshipURL': scholarship.get('Attach the url containing this scholarships info and application information?', '').lower()
-            
+            'scholarshipURL': scholarship.get('Attach the url containing this scholarships info and application information?', '').lower(),
+            'deadline': scholarship.get('What is the deadline of the scholarship?', '').lower(),
+            'awardAmount': scholarship.get('What is the award amount of the scholarship?', '').lower(),
+            'scholarshipDescription': scholarship.get('What is the description of the scholarship?', '').lower(),
         }
 
         # Extract the same data individually for further processing
