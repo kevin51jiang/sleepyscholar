@@ -5,11 +5,23 @@ import json
 from groq import Groq
 import re
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 client = Groq(
-        api_key=""
+        api_key="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"
         )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],
+)
+
+@app.get("/")
+async def read_root():
+    return {"message": "CORS enabled for all origins!"}
 
 app = FastAPI()
 
@@ -76,10 +88,10 @@ async def get_top_20_scholarships():
         raise HTTPException(status_code=404, detail="No scholarships available.")
     return allScholarship
 
-def sendUserEssay() -> str:
-    currentScholarshipDict = 
+@app.post("/generate", scholarship=str)
+async def generate_content(request: GenerateRequest):
 
-    scholarshipQuestionCurrent = currentScholarshipDict['scholarshipQuestions']
+    scholarshipQuestionCurrent = GenerateRequest['scholarshipQuestions']
 
     chat_completion = client.chat.completions.create(
             messages=[
@@ -89,13 +101,12 @@ def sendUserEssay() -> str:
                                     You are tasked with generating an essay response for the user, considering the following:
 
                                     ### User Data:
-                                    - Resume: {user_resume}
-                                    - Previous Essay: {previous_essay}
+                                    {user_data}
 
                                     ### Essay Question:
                                     {scholarshipQuestionCurrent}
 
-                                    Please generate an essay that incorporates the user's professional background, writing style from the previous essay, and is relevant to the essay question provided. Ensure the response is coherent and tailored to the user's experience and is around 300 words.
+                                    Please generate an essay that incorporates the user's professional background and is relevant to the essay question provided. Ensure the response is coherent and tailored to the user's experience and is around 300 words.
                                 """,
                 }
             ],
@@ -196,3 +207,20 @@ async def search_scholarships(search: ScholarshipSearch):
     return matching_scholarships
 
     #return the matching dict 
+
+@app.post("/generate", scholarship=dict)
+async def generate_content(request: GenerateRequest):
+    # Using Groq or any other model to generate content
+    response = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": f"Generate content based on the following text and context: {request.text} \n Context: {request.context}"
+            }
+        ],
+        model="llama-3.2-90b-text-preview",
+    )
+    
+    generated_content = response.choices[0].message.content
+    
+    return {"generated_content": generated_content}
